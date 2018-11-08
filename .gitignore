@@ -3,3 +3,8 @@ ProjectSettings/
 Temp/
 MMO_ARPG_Project/MMO_ARPG_Project.sln
 *.meta
+MMO_ARPG_Project/.vs/MMO_ARPG_Project/v15/Server/sqlite3/storage.ide-wal
+MMO_ARPG_Project/.vs/MMO_ARPG_Project/v15/Server/sqlite3/storage.ide-shm
+MMO_ARPG_Project/.vs/MMO_ARPG_Project/v15/Server/sqlite3/storage.ide
+MMO_ARPG_Project/.vs/MMO_ARPG_Project/v15/Server/sqlite3/db.lock
+MMO_ARPG_Project/.vs/MMO_ARPG_Project/v15/.suo

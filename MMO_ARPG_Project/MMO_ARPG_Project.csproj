@@ -219,6 +219,23 @@
     <Compile Include="Assets\NGUI\Scripts\UI\UITexture.cs" />
     <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
     <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
+    <Compile Include="Assets\NICode\Common\EventNotifyMgr.cs" />
+    <Compile Include="Assets\NICode\Common\Game.cs" />
+    <Compile Include="Assets\NICode\Common\IInit.cs" />
+    <Compile Include="Assets\NICode\Common\IRefCounter.cs" />
+    <Compile Include="Assets\NICode\Common\IRelease.cs" />
+    <Compile Include="Assets\NICode\Common\IUpdate.cs" />
+    <Compile Include="Assets\NICode\Common\NIDebug.cs" />
+    <Compile Include="Assets\NICode\Common\Singleton.cs" />
+    <Compile Include="Assets\NICode\Common\SingletonMB.cs" />
+    <Compile Include="Assets\NICode\Common\TimeMgr.cs" />
+    <Compile Include="Assets\NICode\Extensions\DotnetExtensions.cs" />
+    <Compile Include="Assets\NICode\UI\IMark.cs" />
+    <Compile Include="Assets\NICode\UI\UIBaseForms.cs" />
+    <Compile Include="Assets\NICode\UI\UIEventNotify.cs" />
+    <Compile Include="Assets\NICode\UI\UIFormsEnum.cs" />
+    <Compile Include="Assets\NICode\UI\UIMark.cs" />
+    <Compile Include="Assets\NICode\UI\UIMgr.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />
@@ -262,6 +279,7 @@
     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Packed 2.shader" />
     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Packed 3.shader" />
     <None Include="Assets\NGUI\Resources\Shaders\Unlit - Transparent Packed.shader" />
+    <None Include="Assets\NICode\Shaders\ImageGray.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
