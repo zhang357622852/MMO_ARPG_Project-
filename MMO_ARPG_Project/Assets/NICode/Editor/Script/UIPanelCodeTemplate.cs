@@ -34,8 +34,32 @@ public static class UIPanelCodeTemplate
         strBuilder.AppendLine("\t#region 内部函数");
         strBuilder.AppendLine();
 
-        // 重载
+        // 重载Init函数
+        strBuilder.AppendLine("\tpublic override void Init()");
+        strBuilder.AppendLine("\t{");
+        strBuilder.AppendLine("\t\tShow();");
+        strBuilder.AppendLine();
+        strBuilder.AppendLine("\t\tRegisterEvent();");
+        strBuilder.AppendLine("\t}");
+
+        strBuilder.AppendLine();
+
+        // 监听事件函数
+        strBuilder.AppendLine("\tprivate void RegisterEvent()");
+        strBuilder.AppendLine("\t{");
+        strBuilder.AppendLine("\t}");
+
+        strBuilder.AppendLine();
+
+        // 重载Show函数
         strBuilder.AppendLine("\tpublic override void Show()");
+        strBuilder.AppendLine("\t{");
+        strBuilder.AppendLine("\t}");
+
+        strBuilder.AppendLine();
+
+        // 按钮事件回调函数
+        strBuilder.AppendLine("\tprivate void OnClickCloseBtn(GameObject go)");
         strBuilder.AppendLine("\t{");
         strBuilder.AppendLine("\t}");
 
@@ -48,7 +72,6 @@ public static class UIPanelCodeTemplate
         strBuilder.AppendLine("\t#endregion");
 
         strBuilder.AppendLine("}");
-
 
         sw.Write(strBuilder);
         sw.Flush();
@@ -72,6 +95,8 @@ public static class UIPanelComponentsCodeTemplate
         strBuilder.AppendFormat("public partial class {0}", scriptName);
         strBuilder.AppendLine();
         strBuilder.AppendLine("{");
+
+        strBuilder.AppendLine("\t[Header(\"----------------\")]");
 
         // mark组件
         for (int i = 0; i < panelCodeData.mMarkObjInfos.Count; i++)

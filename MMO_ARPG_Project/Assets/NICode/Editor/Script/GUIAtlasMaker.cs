@@ -148,6 +148,7 @@ public class GUIAtlasMaker : EditorWindow
     private void MakeAtlas(string arg1, string arg2)
     {
         string pathPreFix = Application.dataPath + "/../" + "Z_RES/";
+
         string shell = "output_images_for_ngui_editor.sh";
         shell = pathPreFix + shell;
 

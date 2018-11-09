@@ -10,7 +10,7 @@ using System.Collections.Generic;
 /// <summary>
 /// 时间工具类
 /// </summary>
-public class TimeUtil : Singleton<TimeUtil>
+public class TimeUtility : Singleton<TimeUtility>
 {
     #region 公有数据成员
 

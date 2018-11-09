@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Game
+public static class GameUtility
 {
     /// <summary>
     /// 比较两个浮点数是否相等

@@ -30,19 +30,43 @@ public enum UIFormsLifeType
 
 public enum UIFormsLayer
 {
-    MainUILayer = 1, //主界面层
+    /// <summary>
+    /// 主界面层
+    /// </summary>
+    MainUILayer = 1,
 
-    CommonUILayer = 1000, //通用层(1.功能层 2.弹窗层)
+    /// <summary>
+    /// 通用层(1.功能层 2.弹窗层)
+    /// </summary>
+    CommonUILayer = 1000,
 
-    RewardLayer = 2000, //物品奖励层
+    /// <summary>
+    /// 物品奖励层
+    /// </summary
+    RewardLayer = 2000,
 
-    TipLayer = 3000, //Tip层
+    /// <summary>
+    /// Tip层
+    /// </summary>
+    TipLayer = 3000,
 
-    NotifyLayer = 4000, //跑马灯层(全服公告内容等等)
+    /// <summary>
+    /// 跑马灯层(全服公告内容等等)
+    /// </summary>
+    NotifyLayer = 4000,
 
-    GuideLayer = 5000, //引导层
+    /// <summary>
+    /// 引导层
+    /// </summary>
+    GuideLayer = 5000,
 
-    LoadingLayer = 7000, //Loading加载层
+    /// <summary>
+    /// Loading加载层
+    /// </summary>
+    LoadingLayer = 7000,
 
-    ServerLayer = 10000, //网络转菊花层
+    /// <summary>
+    /// 网络转菊花层
+    /// </summary>
+    ServerLayer = 10000,
 }

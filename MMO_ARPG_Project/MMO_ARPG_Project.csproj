@@ -220,7 +220,6 @@
     <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
     <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
     <Compile Include="Assets\NICode\Common\EventNotifyMgr.cs" />
-    <Compile Include="Assets\NICode\Common\Game.cs" />
     <Compile Include="Assets\NICode\Common\IInit.cs" />
     <Compile Include="Assets\NICode\Common\IRefCounter.cs" />
     <Compile Include="Assets\NICode\Common\IRelease.cs" />
@@ -228,7 +227,6 @@
     <Compile Include="Assets\NICode\Common\NIDebug.cs" />
     <Compile Include="Assets\NICode\Common\Singleton.cs" />
     <Compile Include="Assets\NICode\Common\SingletonMB.cs" />
-    <Compile Include="Assets\NICode\Common\TimeMgr.cs" />
     <Compile Include="Assets\NICode\Extensions\DotnetExtensions.cs" />
     <Compile Include="Assets\NICode\UI\IMark.cs" />
     <Compile Include="Assets\NICode\UI\UIBaseForms.cs" />
@@ -236,6 +234,10 @@
     <Compile Include="Assets\NICode\UI\UIFormsEnum.cs" />
     <Compile Include="Assets\NICode\UI\UIMark.cs" />
     <Compile Include="Assets\NICode\UI\UIMgr.cs" />
+    <Compile Include="Assets\NICode\Utility\GameUtility.cs" />
+    <Compile Include="Assets\NICode\Utility\TimeUtility.cs" />
+    <Compile Include="Assets\Scripts\UI\StartWnd.cs" />
+    <Compile Include="Assets\Scripts\UI\StartWndComponents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\NGUI\Examples\Atlases\Fantasy\Fantasy Font - Normal.txt" />

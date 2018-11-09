@@ -1,6 +1,6 @@
 /// <summary>
 /// IInit.cs
-/// Created by WinMi 2018/10/23
+/// Created by zhangwm 2018/10/23
 /// 初始化接口
 /// </summary>
 using System.Collections;

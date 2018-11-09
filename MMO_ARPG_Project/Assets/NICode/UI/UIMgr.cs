@@ -22,18 +22,9 @@ public sealed class UIMgr : SingletonMB<UIMgr>
 
     private Dictionary<string, UIBaseForms<MonoBehaviour>> mFormsDic = new Dictionary<string, UIBaseForms<MonoBehaviour>>();
 
-    #region MainUILayer 主界面层
-
-    private int mCurMainUILayerDepth = (int)UIFormsLayer.MainUILayer;
-
-    public GameObject MainUILayerRoot = null;
-
-    #endregion
+    private int mCurUILayerDepth = (int)UIFormsLayer.CommonUILayer;
 
     #region CommonUILayer 通用层(1.功能层 2.弹窗层)
-
-    public GameObject CommonUILayerRoot = null;
-    private int mCurCommonUILayerDepth = (int)UIFormsLayer.CommonUILayer;
 
     //*********************两种窗口类型:1.基础功能界面窗口 2.可叠加弹窗类型********************//
     //1/基础功能界面窗口:1.分为可以缓存窗口和不可以缓存窗口 2.具有导航功能(自定义栈结构,特殊功能就是可以把栈中的元素Top到栈顶)
@@ -41,6 +32,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
     private int mCurStackFormsIndex = 0; //1作为栈的第一个下标
     private Dictionary<string, int> mFormsStackName = new Dictionary<string, int>();
     private Dictionary<int, string> mFormsStackIndex = new Dictionary<int, string>();
+
     //2.可叠加窗口类型: 1.在开启一个新 的基础功能窗口时，会清理掉可叠加窗口
     private Stack<string> mPopupFormsStack = new Stack<string>();
 
@@ -50,8 +42,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
 
     public void ClearData()
     {
-        mCurMainUILayerDepth = (int)UIFormsLayer.MainUILayer;
-        mCurCommonUILayerDepth = (int)UIFormsLayer.CommonUILayer;
+        mCurUILayerDepth = (int)UIFormsLayer.CommonUILayer;
 
         mCurStackFormsIndex = 0;
         mFormsDic.Clear();
@@ -75,20 +66,25 @@ public sealed class UIMgr : SingletonMB<UIMgr>
             forms = _CreateForms<T>(formsName);
 
             if (forms != null)
-                forms.Show();
+            {
+                if (!forms.gameObject.activeSelf)
+                    forms.gameObject.SetActive(true);
+
+                forms.Init();
+            }
         }
         else
-            forms.ReShow();
+        {
+            if (!forms.gameObject.activeSelf)
+                forms.gameObject.SetActive(true);
+
+            forms.Show();
+        }
 
         if (forms != null)
         {
             switch (forms.mFormsLayerType)
             {
-                case UIFormsLayer.MainUILayer:
-                    if (IsAutoDepth)
-                        AutoCalculateDepth(forms, mCurMainUILayerDepth);
-                    break;
-
                 case UIFormsLayer.CommonUILayer:
                     {
                         if (forms.mFormsType == UIFormsType.Normal)
@@ -97,6 +93,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
                             if (mFormsStackIndex.ContainsKey(mCurStackFormsIndex))
                             {
                                 string name = mFormsStackIndex[mCurStackFormsIndex];
+
                                 if (mFormsDic.ContainsKey(name))
                                     mFormsDic[name].Hide();
                             }
@@ -107,11 +104,13 @@ public sealed class UIMgr : SingletonMB<UIMgr>
                                 if (mFormsStackName[formsName] != mCurStackFormsIndex)
                                 {
                                     int tIndex = mFormsStackName[formsName];
+
                                     for (int i = tIndex; i < mCurStackFormsIndex; i++)
                                     {
                                         mFormsStackIndex[i] = mFormsStackIndex[i + 1];
                                         mFormsStackName[mFormsStackIndex[i]] = i;
                                     }
+
                                     mFormsStackIndex[mCurStackFormsIndex] = formsName;
                                     mFormsStackName[formsName] = mCurStackFormsIndex;
                                 }
@@ -127,40 +126,31 @@ public sealed class UIMgr : SingletonMB<UIMgr>
                             {
                                 foreach (var item in mPopupFormsStack)
                                     this.DestroyForms(item);
+
                                 mPopupFormsStack.Clear();
                             }
 
-                            //3.重置depth,
+                            //4.重置depth,
                             //这里可以考虑做成:假栈为空的时候，界面只剩下主界面的时候重置depth
                             //目前是做成:只显示一个normal型窗口，底下normal窗口隐藏，所以这里可以重置depth
-                            //mCurFormsDepth = 1;
+                            mCurUILayerDepth = (int)UIFormsLayer.CommonUILayer;
                         }
                         else if (forms.mFormsType == UIFormsType.Popup)
                         {
                             if (!mPopupFormsStack.Contains(formsName))
                                 mPopupFormsStack.Push(formsName);
                             else
-                                NIDebug.LogWarning("*****************栈窗口已经有此窗口*******************");
+                                Debug.LogWarning("*****************栈窗口已经有此窗口*******************");
                         }
 
                         if (IsAutoDepth)
-                            mCurCommonUILayerDepth = AutoCalculateDepth(forms, mCurCommonUILayerDepth);
+                            mCurUILayerDepth = AutoCalculateDepth(forms, mCurUILayerDepth);
                     }
                     break;
 
-                case UIFormsLayer.RewardLayer:
-                    break;
-                case UIFormsLayer.TipLayer:
-                    break;
-                case UIFormsLayer.NotifyLayer:
-                    break;
-                case UIFormsLayer.GuideLayer:
-                    break;
-                case UIFormsLayer.LoadingLayer:
-                    break;
-                case UIFormsLayer.ServerLayer:
-                    break;
-                default:
+                    default:
+                    if (IsAutoDepth)
+                        AutoCalculateDepth(forms, (int)forms.mFormsLayerType);
                     break;
             }
 
@@ -179,14 +169,11 @@ public sealed class UIMgr : SingletonMB<UIMgr>
             return;
 
         UIBaseForms<MonoBehaviour> forms = null;
+
         if (mFormsDic.TryGetValue(formsName, out forms))
         {
             switch (forms.mFormsLayerType)
             {
-                case UIFormsLayer.MainUILayer:
-                    NIDebug.LogWarning("============MianUILayer类型的窗口不让关闭===============");
-                    return;
-
                 case UIFormsLayer.CommonUILayer:
                     {
                         if (forms.mFormsType == UIFormsType.Normal)
@@ -203,19 +190,11 @@ public sealed class UIMgr : SingletonMB<UIMgr>
                     }
                     break;
 
-                case UIFormsLayer.RewardLayer:
-                    break;
-                case UIFormsLayer.TipLayer:
-                    break;
-                case UIFormsLayer.NotifyLayer:
-                    break;
-                case UIFormsLayer.GuideLayer:
-                    break;
-                case UIFormsLayer.LoadingLayer:
-                    break;
-                case UIFormsLayer.ServerLayer:
-                    break;
                 default:
+                    if (forms.mFormsLifeType == UIFormsLifeType.GoldLife)
+                        forms.Hide();
+                    else if (forms.mFormsLifeType == UIFormsLifeType.HumanLife)
+                        DestroyForms(formsName);
                     break;
             }
         }
@@ -224,6 +203,13 @@ public sealed class UIMgr : SingletonMB<UIMgr>
     #endregion
 
     #region 内部接口
+
+    /// <summary>
+    /// 创建窗口
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="formsName"></param>
+    /// <returns></returns>
     private T _CreateForms<T>(string formsName) where T: UIBaseForms<MonoBehaviour>
     {
         string path = PREFABS_PATH + formsName;
@@ -232,7 +218,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
 
         if (prefabGo == null)
         {
-            NIDebug.LogWarning("**********************路径下没有这个窗体预制体***************************" + formsName);
+            Debug.LogWarning("**********************路径下没有这个窗体预制体***************************" + formsName);
             return null;
         }
 
@@ -247,54 +233,21 @@ public sealed class UIMgr : SingletonMB<UIMgr>
             formsScript = go.AddComponent<T>();
         if (formsScript == null)
         {
-            NIDebug.LogWarning("**********************不存在此脚本***************************");
+            Debug.LogWarning("**********************不存在此脚本***************************");
             return null;
         }
 
         go.name = formsName;
         Transform t = go.transform;
 
-        switch (formsScript.mFormsLayerType)
-        {
-            case UIFormsLayer.MainUILayer:
-                if (MainUILayerRoot != null)
-                    t.parent = MainUILayerRoot.transform;
-                break;
-
-            case UIFormsLayer.CommonUILayer:
-                if (CommonUILayerRoot != null)
-                    t.parent = CommonUILayerRoot.transform;
-                break;
-
-            case UIFormsLayer.RewardLayer:
-                break;
-
-            case UIFormsLayer.TipLayer:
-                break;
-
-            case UIFormsLayer.NotifyLayer:
-                break;
-
-            case UIFormsLayer.GuideLayer:
-                break;
-
-            case UIFormsLayer.LoadingLayer:
-                break;
-
-            case UIFormsLayer.ServerLayer:
-                break;
-
-            default:
-                if (mFormsUIRoot != null)
-                    t.parent = mFormsUIRoot.transform;
-                break;
-        }
+        if (mFormsUIRoot != null)
+            t.parent = mFormsUIRoot.transform;
 
         t.localPosition = Vector3.zero;
         t.localRotation = Quaternion.identity;
         t.localScale = Vector3.one;
 
-        mFormsDic.Add(formsName, formsScript);
+        mFormsDic[formsName] = formsScript;
 
         return formsScript;
     }
@@ -307,7 +260,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
         UIPanel parentPanel = forms.GetComponent<UIPanel>();
         if (parentPanel == null)
         {
-            NIDebug.LogWarning("=============自动给Forms层级排序========parentPanel是null======");
+            Debug.LogWarning("=============自动给Forms层级排序========parentPanel是null======");
             return curDepth;
         }
 
@@ -326,6 +279,10 @@ public sealed class UIMgr : SingletonMB<UIMgr>
         return curDepth + maxDis + 1;
     }
 
+    /// <summary>
+    /// 入栈窗口
+    /// </summary>
+    /// <param name="formsName"></param>
     private void PushForms(string formsName)
     {
         if (!mFormsStackName.ContainsKey(formsName))
@@ -334,14 +291,18 @@ public sealed class UIMgr : SingletonMB<UIMgr>
             mFormsStackIndex.Add(mCurStackFormsIndex, formsName);
         }
         else
-            NIDebug.LogWarning("**************功能窗口栈已有此窗口*****************");
+            Debug.LogWarning("**************功能窗口栈已有此窗口*****************");
     }
 
+    /// <summary>
+    /// 出栈窗口
+    /// </summary>
+    /// <param name="formsName"></param>
     private void PopForms(string formsName)
     {
         if (!mFormsStackIndex[mCurStackFormsIndex].Equals(formsName))
         {
-            NIDebug.LogWarning("*************此窗口不是栈顶窗口，无法Pop****************");
+            Debug.LogWarning("*************此窗口不是栈顶窗口，无法Pop****************");
             return;
         }
         if (mFormsStackName.ContainsKey(formsName))
@@ -351,19 +312,25 @@ public sealed class UIMgr : SingletonMB<UIMgr>
         }
     }
 
+    /// <summary>
+    /// 销毁窗口
+    /// </summary>
+    /// <param name="formsName"></param>
     private void DestroyForms(string formsName)
     {
         if (string.IsNullOrEmpty(formsName))
             return;
 
         UIBaseForms<MonoBehaviour> forms = null;
+
         if (mFormsDic.TryGetValue(formsName, out forms))
         {
             forms.End();
-            GameObject.Destroy(forms.gameObject);
             mFormsDic.Remove(formsName);
+            GameObject.DestroyImmediate(forms.gameObject);
         }
     }
+
     #endregion
 
 }
