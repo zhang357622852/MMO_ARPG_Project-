@@ -7,13 +7,29 @@ using System.Diagnostics;
 public class GUIAtlasMaker : EditorWindow
 {
     private static string[] dirs = null;
+
     private static List<string> dirList = new List<string>();
+
     private static List<string> grayList = new List<string>() {
         "BuildingIcon"
     };
 
-    private static string CONFIG_PATH = Application.dataPath + "/AtlasRes/"; //图集.png，图集配置文件.txt，材质球.mat
-    private static string PREFAB_PATH = Application.dataPath + "/Resources/Atlas/"; //图集预制.prefab
+    private static string ATLAS_PATH
+    {
+        get
+        {
+            //图集.png，图集配置文件.txt，材质球.mat 图集预制.prefab
+            return ((Application.dataPath + "/Art/").CreateDirIfNotExist() + "Atlas/").CreateDirIfNotExist();
+        }
+    }
+
+    private static string Z_RES_PATH
+    {
+        get
+        {
+            return ((Application.dataPath + "/../" + "Z_RES/").CreateDirIfNotExist() + "Atlas/").CreateDirIfNotExist();
+        }
+    }
 
     /// <summary>
     /// 获取待打包图集的文件夹列表
@@ -21,11 +37,14 @@ public class GUIAtlasMaker : EditorWindow
     private static void Refresh()
     {
         dirList.Clear();
-        string rootPath = Application.dataPath + "/../" + "Z_RES/Atlas";
+
+        string rootPath = Z_RES_PATH;
         dirs = Directory.GetDirectories(rootPath, "*.*", SearchOption.AllDirectories);
+
         for (int i = 0; i < dirs.Length; i++)
         {
             dirs[i] = dirs[i].Replace("\\", "/");
+
             dirList.Add(dirs[i]);
         }
     }
@@ -33,8 +52,8 @@ public class GUIAtlasMaker : EditorWindow
     [MenuItem("Tools/AtlasEditor")]
     private static void Init()
     {
-
         Refresh();
+
         GUIAtlasMaker window = (GUIAtlasMaker)EditorWindow.GetWindow(typeof(GUIAtlasMaker));
         window.minSize = new Vector2(500, 520);
         window.titleContent = new GUIContent("UIAtlasEditor");
@@ -63,8 +82,8 @@ public class GUIAtlasMaker : EditorWindow
         //未创建的在前，已创建的在后
         dirList.Sort((string a, string b) =>
         {
-            string aPath = a.Replace("Z_RES/Atlas/", "Assets/AtlasRes/");
-            string bPath = b.Replace("Z_RES/Atlas/", "Assets/AtlasRes/");
+            string aPath = a.Replace("Z_RES/Atlas/", "Assets/Art/Atlas/");
+            string bPath = b.Replace("Z_RES/Atlas/", "Assets/Art/Atlas/");
             bool ae = Directory.Exists(aPath);
             bool be = Directory.Exists(bPath);
             if (ae && !be)
@@ -89,7 +108,7 @@ public class GUIAtlasMaker : EditorWindow
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(10f);
-            string resPath = dirList[i].Replace("Z_RES/Atlas/", "Assets/AtlasRes/");
+            string resPath = dirList[i].Replace("Z_RES/Atlas/", "Assets/Art/Atlas/");
             string buttonTxt = "";
             bool isNew = false;
             if (Directory.Exists(resPath))
@@ -119,10 +138,10 @@ public class GUIAtlasMaker : EditorWindow
             {
                 if (GUILayout.Button("配置文件", GUILayout.Width(70f), GUILayout.Height(20)))
                 {
-                    if (File.Exists(PREFAB_PATH + atlasName + "/" + atlasName + "Atlas" + ".prefab"))
+                    if (File.Exists(ATLAS_PATH + atlasName + "/" + atlasName + "Atlas" + ".prefab"))
                     {
                         UIAtlas atlas = Resources.Load<UIAtlas>("Atlas/" + atlasName + "/" + atlasName + "Atlas");
-                        string textPath = CONFIG_PATH + atlasName + "/" + atlasName + ".txt";
+                        string textPath = ATLAS_PATH + atlasName + "/" + atlasName + ".txt";
                         textPath = GetProjectRelativePath(textPath);
 
                         TextAsset configuration = AssetDatabase.LoadAssetAtPath<TextAsset>(textPath);
@@ -167,9 +186,9 @@ public class GUIAtlasMaker : EditorWindow
     //resName:文件夹名字->Common
     private void SetMeta(string resName)
     {
-        string pngPath = CONFIG_PATH + resName + "/" + resName + ".png";
-        string alphaPath = CONFIG_PATH + resName + "/" + resName + "_alpha" + ".png";
-        string textPath = CONFIG_PATH + resName + "/" + resName + ".txt";
+        string pngPath = ATLAS_PATH + resName + "/" + resName + ".png";
+        string alphaPath = ATLAS_PATH + resName + "/" + resName + "_alpha" + ".png";
+        string textPath = ATLAS_PATH + resName + "/" + resName + ".txt";
 
         pngPath = GetProjectRelativePath(pngPath);
         alphaPath = GetProjectRelativePath(alphaPath);
@@ -198,7 +217,7 @@ public class GUIAtlasMaker : EditorWindow
         //texImp.textureFormat = TextureImporterFormat.Alpha8;
         texImp.SaveAndReimport();
 
-        if (!File.Exists(PREFAB_PATH + resName + "/" + resName + "Atlas" + ".prefab"))
+        if (!File.Exists(ATLAS_PATH + resName + "/" + resName + "Atlas" + ".prefab"))
         {
             //创建一个材质球并且配置好
             Shader shader = Shader.Find("MyShader/two_tex_ui 1");
@@ -226,9 +245,9 @@ public class GUIAtlasMaker : EditorWindow
             NGUIJson.LoadSpriteData(atlas, ta);
             atlas.MarkAsChanged();
 
-            if (!Directory.Exists(PREFAB_PATH + resName))
+            if (!Directory.Exists(ATLAS_PATH + resName))
             {
-                Directory.CreateDirectory(PREFAB_PATH + resName);
+                Directory.CreateDirectory(ATLAS_PATH + resName);
             }
             PrefabUtility.CreatePrefab("Assets/Resources/Atlas/" + resName + "/" + obj.name + ".prefab", obj, ReplacePrefabOptions.ReplaceNameBased);
             GameObject.DestroyImmediate(obj);
