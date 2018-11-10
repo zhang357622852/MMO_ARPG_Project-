@@ -16,7 +16,7 @@ public static class UIPanelCodeTemplate
         strBuilder.AppendLine("/// <summary>");
         strBuilder.AppendFormat("/// {0}.cs", scriptName);
         strBuilder.AppendLine();
-        strBuilder.AppendFormat("/// Created by zhangwm {0}/{1}/{2}", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+        strBuilder.AppendFormat("/// Created by WinMi {0}/{1}/{2}", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
         strBuilder.AppendLine();
         strBuilder.AppendLine("///");
         strBuilder.AppendLine("/// </summary>");

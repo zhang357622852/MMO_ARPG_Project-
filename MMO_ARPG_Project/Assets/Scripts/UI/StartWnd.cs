@@ -1,6 +1,6 @@
 /// <summary>
 /// StartWnd.cs
-/// Created by zhangwm 2018/11/9
+/// Created by WinMi 2018/11/9
 ///
 /// </summary>
 

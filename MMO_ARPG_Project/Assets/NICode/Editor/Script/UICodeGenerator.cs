@@ -1,6 +1,6 @@
 /// <summary>
 /// UICodeGenerator.cs
-/// Created by zhangwm 2018/11/05
+/// Created by WinMi 2018/11/05
 /// UI界面文件代码生成
 /// </summary>
 using System.Collections;

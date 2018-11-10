@@ -1,6 +1,6 @@
 /// <summary>
 /// EventNotifyMgr.cs
-/// Created by zhangwm 2018/10/24
+/// Created by WinMi 2018/10/24
 /// 消息事件管理类
 /// </summary>
 using System;

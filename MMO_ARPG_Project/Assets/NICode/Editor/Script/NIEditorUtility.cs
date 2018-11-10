@@ -1,3 +1,9 @@
+/// <summary>
+/// NIEditorUtility.cs
+/// Created by WinMi 2017/12/9
+/// Editor静态工具类
+/// </summary>
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,19 +42,16 @@ public class OpenFileName
     public int flagsEx = 0;
 }
 
-/// <summary>
-/// Author: WinMi
-/// Description: Editor静态工具类
-/// </summary>
 public static class NIEditorUtility
 {
-    private static string authorIconPath = "Assets/WinMi/Editor/GUI/authorIcon.png";
+    private static string authorIconPath = "Assets/NICode/Editor/GUI/authorIcon.png";
+
     private static Texture2D authorTexture2d = (Texture2D)AssetDatabase.LoadMainAssetAtPath(authorIconPath);
 
     public static void DrawAuthorSummary()
     {
         GUILayout.BeginHorizontal("AS TextArea", GUILayout.MinHeight(65));
-        GUILayout.Box(new GUIContent(authorTexture2d, "俺只是一张图片o(*￣︶￣*)o"));
+        GUILayout.Box(new GUIContent(authorTexture2d, "头像o(*￣︶￣*)o"));
         GUILayout.Space(10);
         GUILayout.BeginVertical();
         GUIStyle style = new GUIStyle();

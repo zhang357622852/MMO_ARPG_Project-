@@ -23,11 +23,31 @@ public class GUIAtlasMaker : EditorWindow
         }
     }
 
+    private static string ATLAS_PREFAB_PATH
+    {
+        get
+        {
+            return ((Application.dataPath + "/Resources/").CreateDirIfNotExist() + "Atlas/").CreateDirIfNotExist();
+        }
+    }
+
     private static string Z_RES_PATH
     {
         get
         {
             return ((Application.dataPath + "/../" + "Z_RES/").CreateDirIfNotExist() + "Atlas/").CreateDirIfNotExist();
+        }
+    }
+
+    /// <summary>
+    /// TexturePacker安装目录bin
+    /// 填写你本地的安装路径
+    /// </summary>
+    private static string TEXTURE_PACKER_PATH
+    {
+        get
+        {
+            return (@"D:\TexturePacker_3.7.1\bin\");
         }
     }
 
@@ -62,7 +82,7 @@ public class GUIAtlasMaker : EditorWindow
     Vector2 scrollPos ;
     private void OnGUI()
     {
-        GUILayout.BeginHorizontal();
+        GUILayout.BeginVertical();
         NIEditorUtility.DrawAuthorSummary();
         GUILayout.Space(5);
         if (GUILayout.Button("刷新",GUILayout.MaxWidth(70)))
@@ -71,13 +91,10 @@ public class GUIAtlasMaker : EditorWindow
             return;
         }
         GUILayout.Space(5);
-        GUILayout.Label("重新获取待打包图片文件夹", EditorStyles.boldLabel, GUILayout.MaxWidth(350));
-        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
 
         GUILayout.BeginHorizontal();
-        GUILayout.Space(10f);
         GUILayout.BeginVertical();
-        GUILayout.Space(10f);
         GUI.backgroundColor = new Color32(150, 200, 255, 255);
         //未创建的在前，已创建的在后
         dirList.Sort((string a, string b) =>
@@ -125,7 +142,7 @@ public class GUIAtlasMaker : EditorWindow
             //1.创建/更新按钮
             if (GUILayout.Button(buttonTxt, GUILayout.Width(50), GUILayout.Height(20)))
             {
-                MakeAtlas(atlasName, atlasName);
+                MakeAtlas(atlasName);
             }
 
             if (isNew)
@@ -136,12 +153,12 @@ public class GUIAtlasMaker : EditorWindow
             //3.配置文件按钮
             if (!isNew)
             {
-                if (GUILayout.Button("配置文件", GUILayout.Width(70f), GUILayout.Height(20)))
+                if (GUILayout.Button("从新引用", GUILayout.Width(70f), GUILayout.Height(20)))
                 {
-                    if (File.Exists(ATLAS_PATH + atlasName + "/" + atlasName + "Atlas" + ".prefab"))
+                    if (File.Exists(ATLAS_PREFAB_PATH + atlasName + "Atlas" + ".prefab"))
                     {
-                        UIAtlas atlas = Resources.Load<UIAtlas>("Atlas/" + atlasName + "/" + atlasName + "Atlas");
-                        string textPath = ATLAS_PATH + atlasName + "/" + atlasName + ".txt";
+                        UIAtlas atlas = Resources.Load<UIAtlas>("Atlas/" + atlasName + "Atlas");
+                        string textPath = ATLAS_PATH + atlasName + ".txt";
                         textPath = GetProjectRelativePath(textPath);
 
                         TextAsset configuration = AssetDatabase.LoadAssetAtPath<TextAsset>(textPath);
@@ -164,23 +181,48 @@ public class GUIAtlasMaker : EditorWindow
     }
 
     //arg1,arg2:文件夹名字->Common
-    private void MakeAtlas(string arg1, string arg2)
+    private void MakeAtlas(string fileName)
     {
         string pathPreFix = Application.dataPath + "/../" + "Z_RES/";
 
-        string shell = "output_images_for_ngui_editor.sh";
-        shell = pathPreFix + shell;
+        string batFile = "output_images_for_ngui_editor.bat";
+        batFile = pathPreFix + batFile;
 
-        Process mProcess = new Process();
-        //传参数给shell脚本格式(中间由空格隔开): 参数1 参数2 参数n
-        ProcessStartInfo startInfo = new ProcessStartInfo(shell, arg1 + " " + arg2 + " " + "alpha");
-        startInfo.WorkingDirectory = pathPreFix;
-        mProcess.StartInfo = startInfo;
-        mProcess.Start();
-        mProcess.WaitForExit();
-        AssetDatabase.Refresh();
+        if (!File.Exists(TEXTURE_PACKER_PATH + "TexturePacker.exe"))
+        {
+            UnityEngine.Debug.LogErrorFormat("TexturePacker安装路径{0}是错误的,请从新填写", TEXTURE_PACKER_PATH);
+            return;
+        }
 
-        SetMeta(arg1);
+        try
+        {
+            // 确保存放.txt,.png文件夹存在
+            (ATLAS_PATH + fileName + "/").CreateDirIfNotExist();
+
+            Process mProcess = new Process();
+
+            //E:/MMO_ARPG_Project/MMO_ARPG_Project/Assets
+            string filePath = Application.dataPath.Replace("/","\\");
+
+            //传参数给bat脚本格式(中间由空格隔开): 参数1 参数2 参数n
+            ProcessStartInfo startInfo = new ProcessStartInfo(batFile, filePath + " " + fileName);
+
+            // 这里的工作目录必须是TexturePacker的bin目录，要不然无法执行TexturePacker命令行
+            // TexturePacker的环境变量已经加入到系统环境变量path中了
+            // 如果是在外部直接点击bat文件是可以执行TexturePacker的，但是这里以Process方式打开，目前就需要设置工作目录
+            startInfo.WorkingDirectory = TEXTURE_PACKER_PATH;
+            mProcess.StartInfo = startInfo;
+            mProcess.Start();
+            mProcess.WaitForExit();
+
+            AssetDatabase.Refresh();
+
+            SetMeta(fileName);
+        }
+        catch (System.Exception ex)
+        {
+            UnityEngine.Debug.LogException(ex);
+        }
     }
 
     //resName:文件夹名字->Common
@@ -217,41 +259,41 @@ public class GUIAtlasMaker : EditorWindow
         //texImp.textureFormat = TextureImporterFormat.Alpha8;
         texImp.SaveAndReimport();
 
-        if (!File.Exists(ATLAS_PATH + resName + "/" + resName + "Atlas" + ".prefab"))
-        {
-            //创建一个材质球并且配置好
-            Shader shader = Shader.Find("MyShader/two_tex_ui 1");
-            Material mat = new Material(shader);
+        //if (!File.Exists(ATLAS_PATH + resName + "/" + resName + "Atlas" + ".prefab"))
+        //{
+        //    //创建一个材质球并且配置好
+        //    Shader shader = Shader.Find("MyShader/two_tex_ui 1");
+        //    Material mat = new Material(shader);
 
-            Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(pngPath);
-            Texture alp_texture = AssetDatabase.LoadAssetAtPath<Texture>(alphaPath);
-            mat.name = resName;
-            mat.SetTexture("_MainTex", texture);
-            texture = AssetDatabase.LoadAssetAtPath<Texture>(alphaPath);
-            mat.SetTexture("_FlagTex", texture);
-            AssetDatabase.CreateAsset(mat, GetProjectRelativePath(Application.dataPath + "/AtlasRes/" + resName + "/" + resName + ".mat"));
+        //    Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(pngPath);
+        //    Texture alp_texture = AssetDatabase.LoadAssetAtPath<Texture>(alphaPath);
+        //    mat.name = resName;
+        //    mat.SetTexture("_MainTex", texture);
+        //    texture = AssetDatabase.LoadAssetAtPath<Texture>(alphaPath);
+        //    mat.SetTexture("_FlagTex", texture);
+        //    AssetDatabase.CreateAsset(mat, GetProjectRelativePath(Application.dataPath + "/AtlasRes/" + resName + "/" + resName + ".mat"));
 
-            //创建一个预设体且配置好
-            GameObject obj = new GameObject();
-            UIAtlas atlas = obj.AddComponent<UIAtlas>();
-            obj.name = resName + "Atlas";
-            atlas.spriteMaterial = mat;
+        //    //创建一个预设体且配置好
+        //    GameObject obj = new GameObject();
+        //    UIAtlas atlas = obj.AddComponent<UIAtlas>();
+        //    obj.name = resName + "Atlas";
+        //    atlas.spriteMaterial = mat;
 
-            if (atlas.texture != null)
-                NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
-            atlas.MarkAsChanged();
+        //    if (atlas.texture != null)
+        //        NGUIEditorTools.ImportTexture(atlas.texture, false, false, !atlas.premultipliedAlpha);
+        //    atlas.MarkAsChanged();
 
-            TextAsset ta = AssetDatabase.LoadAssetAtPath<TextAsset>(textPath);
-            NGUIJson.LoadSpriteData(atlas, ta);
-            atlas.MarkAsChanged();
+        //    TextAsset ta = AssetDatabase.LoadAssetAtPath<TextAsset>(textPath);
+        //    NGUIJson.LoadSpriteData(atlas, ta);
+        //    atlas.MarkAsChanged();
 
-            if (!Directory.Exists(ATLAS_PATH + resName))
-            {
-                Directory.CreateDirectory(ATLAS_PATH + resName);
-            }
-            PrefabUtility.CreatePrefab("Assets/Resources/Atlas/" + resName + "/" + obj.name + ".prefab", obj, ReplacePrefabOptions.ReplaceNameBased);
-            GameObject.DestroyImmediate(obj);
-        }
+        //    if (!Directory.Exists(ATLAS_PATH + resName))
+        //    {
+        //        Directory.CreateDirectory(ATLAS_PATH + resName);
+        //    }
+        //    PrefabUtility.CreatePrefab("Assets/Resources/Atlas/" + resName + "/" + obj.name + ".prefab", obj, ReplacePrefabOptions.ReplaceNameBased);
+        //    GameObject.DestroyImmediate(obj);
+        //}
     }
 
     static string GetProjectRelativePath(string AP)
