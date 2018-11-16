@@ -2,11 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 窗体的抽象基类
-/// </summary>
-[RequireComponent(typeof(UIPanel))]
-public abstract class UIBaseForms<T> : MonoBehaviour
+public abstract class UIBaseFormsRoot : MonoBehaviour
 {
     [Tooltip("窗口类型")]
     public UIFormsType mFormsType = UIFormsType.Normal;
@@ -16,11 +12,6 @@ public abstract class UIBaseForms<T> : MonoBehaviour
 
     [Tooltip("窗口层级类型")]
     public UIFormsLayer mFormsLayerType = UIFormsLayer.CommonUILayer;
-
-    /// <summary>
-    /// 窗口名
-    /// </summary>
-    public static readonly string FormsName = typeof(T).Name;
 
     /// <summary>
     /// 第一次创建窗口时调用
@@ -47,6 +38,13 @@ public abstract class UIBaseForms<T> : MonoBehaviour
     {
 
     }
+}
 
-
+[RequireComponent(typeof(UIPanel))]
+public abstract class UIBaseForms<T> : UIBaseFormsRoot
+{
+    /// <summary>
+    /// 窗口名
+    /// </summary>
+    public static readonly string FormsName = typeof(T).Name;
 }

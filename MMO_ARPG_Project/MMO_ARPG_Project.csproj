@@ -234,8 +234,10 @@
     <Compile Include="Assets\NICode\UI\UIFormsEnum.cs" />
     <Compile Include="Assets\NICode\UI\UIMark.cs" />
     <Compile Include="Assets\NICode\UI\UIMgr.cs" />
+    <Compile Include="Assets\NICode\UI\UIRootInit.cs" />
     <Compile Include="Assets\NICode\Utility\GameUtility.cs" />
     <Compile Include="Assets\NICode\Utility\TimeUtility.cs" />
+    <Compile Include="Assets\Scripts\NewBehaviourScript.cs" />
     <Compile Include="Assets\Scripts\UI\StartWnd.cs" />
     <Compile Include="Assets\Scripts\UI\StartWndComponents.cs" />
   </ItemGroup>

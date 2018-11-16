@@ -15,9 +15,9 @@ rem %2 StartMenu
 TexturePacker --smart-update %1\..\Z_RES\Atlas\%2 --data %1\Art\Atlas\%2\%2.txt --format unity --sheet %1\Art\Atlas\%2\%2.png --disable-rotation --no-trim --reduce-border-artifacts
 
 rem alpha通道图片
-copy %1\Art\Atlas\%2\%2.png %1\Art\Atlas\%2\%2_alpha.jpg
+copy %1\Art\Atlas\%2\%2.png %1\Art\Atlas\%2\%2_alpha.png
 
 rem 延迟5秒,执行后面的命令
 rem ping -n 5 127.0.0.1
 
-rem pause
+pause

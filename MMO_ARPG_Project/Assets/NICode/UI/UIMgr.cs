@@ -14,13 +14,13 @@ using UnityEngine;
 /// <summary>
 /// 窗体管理类
 /// </summary>
-public sealed class UIMgr : SingletonMB<UIMgr>
+public sealed class UIMgr : Singleton<UIMgr>
 {
     private const string PREFABS_PATH = "Prefabs/UI/";
 
     public GameObject mFormsUIRoot = null;
 
-    private Dictionary<string, UIBaseForms<MonoBehaviour>> mFormsDic = new Dictionary<string, UIBaseForms<MonoBehaviour>>();
+    private Dictionary<string, UIBaseFormsRoot> mFormsDic = new Dictionary<string, UIBaseFormsRoot>();
 
     private int mCurUILayerDepth = (int)UIFormsLayer.CommonUILayer;
 
@@ -33,7 +33,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
     private Dictionary<string, int> mFormsStackName = new Dictionary<string, int>();
     private Dictionary<int, string> mFormsStackIndex = new Dictionary<int, string>();
 
-    //2.可叠加窗口类型: 1.在开启一个新 的基础功能窗口时，会清理掉可叠加窗口
+    //2.popup窗口类型: 1.在开启一个新 的基础功能窗口时，会清理掉可叠加窗口
     private Stack<string> mPopupFormsStack = new Stack<string>();
 
     #endregion
@@ -52,14 +52,14 @@ public sealed class UIMgr : SingletonMB<UIMgr>
     }
 
     /// <summary>
-    /// 创建窗口
+    /// 显示窗口
     /// </summary>
-    public T ShowForms<T>(string formsName, bool IsAutoDepth = true) where T: UIBaseForms<MonoBehaviour>
+    public T ShowForms<T>(string formsName, bool IsAutoDepth = true) where T: UIBaseFormsRoot
     {
         if (string.IsNullOrEmpty(formsName))
             return null;
 
-        UIBaseForms<MonoBehaviour> forms = null;
+        UIBaseFormsRoot forms = null;
 
         if (!mFormsDic.TryGetValue(formsName, out forms))
         {
@@ -168,7 +168,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
         if (string.IsNullOrEmpty(formsName))
             return;
 
-        UIBaseForms<MonoBehaviour> forms = null;
+        UIBaseFormsRoot forms = null;
 
         if (mFormsDic.TryGetValue(formsName, out forms))
         {
@@ -210,7 +210,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
     /// <typeparam name="T"></typeparam>
     /// <param name="formsName"></param>
     /// <returns></returns>
-    private T _CreateForms<T>(string formsName) where T: UIBaseForms<MonoBehaviour>
+    private T _CreateForms<T>(string formsName) where T: UIBaseFormsRoot
     {
         string path = PREFABS_PATH + formsName;
 
@@ -218,7 +218,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
 
         if (prefabGo == null)
         {
-            Debug.LogWarning("**********************路径下没有这个窗体预制体***************************" + formsName);
+            NIDebug.LogError("**********************路径下没有这个窗体预制体***************************" + formsName);
             return null;
         }
 
@@ -233,7 +233,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
             formsScript = go.AddComponent<T>();
         if (formsScript == null)
         {
-            Debug.LogWarning("**********************不存在此脚本***************************");
+            NIDebug.LogError("**********************不存在此脚本***************************");
             return null;
         }
 
@@ -255,7 +255,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
     /// <summary>
     /// 自动给Forms层级排序
     /// </summary>
-    private int AutoCalculateDepth(UIBaseForms<MonoBehaviour> forms, int curDepth)
+    private int AutoCalculateDepth(UIBaseFormsRoot forms, int curDepth)
     {
         UIPanel parentPanel = forms.GetComponent<UIPanel>();
         if (parentPanel == null)
@@ -321,7 +321,7 @@ public sealed class UIMgr : SingletonMB<UIMgr>
         if (string.IsNullOrEmpty(formsName))
             return;
 
-        UIBaseForms<MonoBehaviour> forms = null;
+        UIBaseFormsRoot forms = null;
 
         if (mFormsDic.TryGetValue(formsName, out forms))
         {
