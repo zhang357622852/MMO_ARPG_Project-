@@ -21,6 +21,29 @@ public static class GameUtility
     }
 
     /// <summary>
+    /// Gets the Md5.
+    /// </summary>
+    /// <returns>The M d5.</returns>
+    /// <param name="sDataIn">S data in.</param>
+    public static string GetStrMD5(string sDataIn)
+    {
+        MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+        byte[] bytValue, bytHash;
+        bytValue = System.Text.Encoding.UTF8.GetBytes(sDataIn);
+        bytHash = md5.ComputeHash(bytValue);
+        md5.Clear();
+        
+        string sTemp = "";
+
+        foreach (byte b in bytHash)
+        {
+            sTemp += Convert.ToString(b, 16);
+        }
+
+        return sTemp.ToLower();
+    }
+
+    /// <summary>
     /// 得到文件MD5
     /// </summary>
     public static string GetFileMD5(string filePath)
